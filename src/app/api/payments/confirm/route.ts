@@ -15,7 +15,7 @@ const body = z.object({ email: z.string().email(), plan: z.enum(["starter", "gro
 
 export async function POST(req: Request) {
   const secret = process.env.PAYMENT_WEBHOOK_SECRET;
-  if (!secret) return fail(503, "PAYMENT_WEBHOOK_SECRET is not configured.");
+  if (!secret) return fail(503, "Payment confirmation is unavailable.");
   const sent = Buffer.from(req.headers.get("x-webhook-secret") ?? "");
   const want = Buffer.from(secret);
   if (sent.length !== want.length || !timingSafeEqual(sent, want)) return fail(401, "Unauthorized.");
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   const parsed = body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail(400, "Invalid payload.");
   const admin = adminClient();
-  if (!admin) return fail(503, "Service role key is not configured.");
+  if (!admin) return fail(503, "Payment confirmation is unavailable.");
 
   const { email, plan, reference } = parsed.data;
   const { data: users, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });

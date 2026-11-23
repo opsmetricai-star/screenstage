@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   const parsed = body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail(400, "Please answer every question and enter a valid email.");
   const admin = adminClient();
-  if (!admin) return fail(503, "Submissions are unavailable until Supabase is configured.");
+  if (!admin) return fail(503, "Submissions are temporarily unavailable.");
   const { token, name, email, answers } = parsed.data;
 
   const iv = await admin.from("interviews").select("id, user_id, role_id, title, script").eq("share_token", token).single();

@@ -3,7 +3,7 @@ import { z } from "zod";
 /** Calls Gemini with JSON output and validates the result with a zod schema. Server-only. */
 export async function geminiJson<T>(prompt: string, schema: z.ZodType<T>, responseSchema: object): Promise<T> {
   const key = process.env.GEMINI_API_KEY;
-  if (!key) throw new GeminiError("not_configured", "GEMINI_API_KEY is not set on the server.");
+  if (!key) throw new GeminiError("not_configured", "The AI service is temporarily unavailable.");
   // Primary model first, then fallbacks when a model is overloaded (503/429).
   const models = [...new Set([process.env.GEMINI_MODEL || "gemini-flash-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash"])];
   let lastStatus = 0;

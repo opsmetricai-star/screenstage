@@ -11,9 +11,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!supabaseConfigured()) {
     return (
       <div className="min-h-screen grid place-items-center p-8"><div className="card p-10 max-w-lg">
-        <Logo /><h1 className="text-[28px] mt-6">Connect Supabase to continue</h1>
-        <p className="text-soft mt-3">The dashboard needs a database and authentication. Add <code>NEXT_PUBLIC_SUPABASE_URL</code>, <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> and <code>SUPABASE_SERVICE_ROLE_KEY</code> to <code>.env.local</code>, run <code>supabase/schema.sql</code> in your project, then restart.</p>
-        <Link href="/" className="btn btn-ghost mt-6">Back to site</Link>
+        <Logo /><h1 className="text-[28px] mt-6">Your workspace is temporarily unavailable</h1>
+        <p className="text-soft mt-3">We could not reach the service that powers your dashboard. Please try again in a few minutes.</p>
+        <Link href="/login" className="btn btn-ghost mt-6">Log in</Link>
       </div></div>
     );
   }

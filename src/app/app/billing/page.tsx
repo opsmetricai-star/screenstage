@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { plans } from "@/lib/content";
 
 export const metadata = { title: "Billing" };
-export default async function Billing() {
+export default async function Billing({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
+  const sp = await searchParams;
+  const chosen = plans.find((x) => x.id === sp.plan);
   const supabase = await createClient();
   const [{ data: p }, { data: subs }, { data: { user } }] = await Promise.all([
     supabase.from("profiles").select("plan, credits_total, credits_used").single(),
@@ -17,6 +19,12 @@ export default async function Billing() {
         <div><div className="text-soft text-[14px]">Current plan</div><div className="text-[32px] capitalize">{p?.plan ?? "free"}</div></div>
         <div><div className="flex justify-between text-[14px]"><span>{used} of {total} credits used</span><span className="text-soft">{Math.max(0, total - used)} left</span></div><div className="h-2 bg-line rounded mt-2"><div className="h-2 rounded bg-brand" style={{ width: `${Math.min(100, (used / Math.max(1, total)) * 100)}%` }} /></div></div>
       </div>
+      {chosen && p?.plan !== chosen.id && (
+        <div className="card p-6 mt-6 border-brand/40 flex flex-wrap items-center justify-between gap-4">
+          <div><div className="text-[20px]">Complete checkout for the {chosen.name} plan</div><div className="text-soft text-[15px]">${chosen.price} per month with {chosen.credits.toLocaleString()} AI credits. Use {user?.email} at checkout so the plan attaches to this account.</div></div>
+          <a href={chosen.url} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Pay with Selar</a>
+        </div>
+      )}
       <h2 className="text-[20px] mt-10 mb-3">Choose a plan</h2>
       <div className="grid md:grid-cols-3 gap-4">{plans.map((pl) => (
         <div key={pl.id} className={`card p-6 flex flex-col ${p?.plan === pl.id ? "ring-2 ring-brand" : ""}`}>

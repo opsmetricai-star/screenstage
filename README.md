@@ -4,10 +4,11 @@ Agentic hiring platform: AI interviews, skills assessments and video-interview w
 
 ## What is in the repo
 
-**Public site** (modelled on the reference's structure; original copy and branding)
-- Homepage in the reference's 7-section order, mega-menu navigation (Solutions, Platform, Use Cases, Customers, Resources, Company), footer
-- 5 solution pages, 6 platform pages, 14 use-case/industry pages (data-driven from `src/lib/content.ts`)
-- Pricing (Selar links), About, Customers, Resources (+ working ROI calculator), Blog, Careers, Contact, Demo request, Candidate support, Legal templates
+**Public site** (original copy and branding)
+- Homepage, mega-menu navigation, footer
+- 4 solution pages, 2 platform pages, 14 use-case pages (data-driven from `src/lib/content.ts`)
+- Pricing (Selar links via signup and billing), About, Hiring ROI calculator, Candidate support, Legal pages
+- Calls to action are limited to Sign up and Log in
 
 **Application** (`/app`, protected)
 - Auth: sign-up, login, logout, password recovery/reset, session refresh in `src/proxy.ts`
@@ -39,7 +40,8 @@ Upgrade buttons open the Selar links. A redirect never unlocks a plan. Plans act
 Import the repo, add the variables above, deploy. Add your Vercel URL to Supabase Auth, URL Configuration (Site URL and redirect `/reset-password`, `/app`).
 
 ## Known limitations
-- Video interviewing, the live interview co-pilot, ATS connectors and cheating detection are described on the marketing pages but are **not implemented** as product features. The AI interviewer is text-based.
-- Reference imagery, customer logos and some illustrations are recreated with CSS or placeholders, not copied.
-- Selar webhook signature verification is not wired; the endpoint uses a shared secret and expects you to forward verified events.
-- Legal pages are templates and need counsel review.
+- Video interviewing, live interview co-pilot, ATS connectors and cheating detection are not built and are not advertised.
+- The AI interviewer is text-based.
+- Selar webhook signature verification is not wired; the confirm endpoint uses a shared secret and expects verified events.
+- Legal pages are starting points and need counsel review before launch.
+- Set `NEXT_PUBLIC_SITE_URL` to the live domain so confirmation and reset emails link to the live site, and set the same URL as the Site URL in Supabase Auth settings.

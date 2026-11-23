@@ -22,24 +22,26 @@ function Form({ mode }: { mode: Mode }) {
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!configured) return setMsg({ kind: "err", text: "Authentication is not configured yet. Add your Supabase keys to .env.local." });
+    if (!configured) return setMsg({ kind: "err", text: "Sign-in is temporarily unavailable. Please try again shortly." });
     const f = new FormData(e.currentTarget);
     const email = String(f.get("email") ?? "");
     const password = String(f.get("password") ?? "");
     if ((mode === "signup" || mode === "reset") && password.length < 8) return setMsg({ kind: "err", text: "Use at least 8 characters for your password." });
     setBusy(true); setMsg(null);
     const supabase = createClient();
-    const origin = window.location.origin;
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    const plan = sp.get("plan");
+    const landing = plan && /^[a-z]+$/.test(plan) ? `/app/billing?plan=${plan}` : "/app";
     let error: { message: string } | null = null;
 
     if (mode === "login") {
       ({ error } = await supabase.auth.signInWithPassword({ email, password }));
       if (!error) { router.replace(sp.get("next")?.startsWith("/app") ? sp.get("next")! : "/app"); router.refresh(); return; }
     } else if (mode === "signup") {
-      const res = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${origin}/app`, data: { full_name: f.get("name"), company: f.get("company") } } });
+      const res = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${origin}${landing}`, data: { full_name: f.get("name"), company: f.get("company") } } });
       error = res.error;
       if (!error) {
-        if (res.data.session) { router.replace("/app"); router.refresh(); return; }
+        if (res.data.session) { router.replace(landing); router.refresh(); return; }
         setMsg({ kind: "ok", text: "Check your inbox to confirm your email, then log in." });
       }
     } else if (mode === "forgot") {
@@ -69,7 +71,6 @@ function Form({ mode }: { mode: Mode }) {
         {mode === "signup" && <p>Already have an account? <Link href="/login" className="text-violet hover:underline">Log in</Link></p>}
         {mode === "forgot" && <p><Link href="/login" className="text-violet hover:underline">Back to log in</Link></p>}
       </div>
-      {!configured && <p className="mt-8 text-[13px] bg-tint rounded-lg p-3 text-soft">Setup needed: Supabase keys are not set, so sign-in is disabled in this environment.</p>}
     </div>
   );
 }
@@ -79,7 +80,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
     <div className="min-h-screen grid lg:grid-cols-2">
       <div className="grid place-items-center p-8"><Suspense><Form mode={mode} /></Suspense></div>
       <div className="hidden lg:grid place-items-center grad-bar p-12 text-white">
-        <div className="max-w-md"><h2 className="text-[40px] leading-tight font-light">Make confident talent decisions.</h2><p className="mt-4 text-white/80 text-[19px]">AI interviews and skills assessments with the evidence behind every score.</p></div>
+        <div className="max-w-md"><h2 className="text-[40px] leading-tight font-light">The AI engine for confident hiring decisions.</h2><p className="mt-4 text-white/80 text-[19px]">Interviews, assessments and ranked recommendations, with the evidence behind every score.</p></div>
       </div>
     </div>
   );

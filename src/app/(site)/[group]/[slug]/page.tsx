@@ -32,7 +32,7 @@ export default async function DetailPage({ params }: P) {
             <div className="eyebrow">{p.eyebrow}</div>
             <h1 className="h-display mt-3">{p.title}</h1>
             <p className="mt-5 text-[21px] leading-snug text-soft max-w-[560px]">{p.lead}</p>
-            <div className="mt-8 flex gap-3 flex-wrap"><Link href="/demo" className="btn btn-primary btn-lg">Request Demo</Link><Link href="/signup" className="btn btn-ghost btn-lg">Start free</Link></div>
+            <div className="mt-8 flex gap-3 flex-wrap"><Link href="/signup" className="btn btn-primary btn-lg">Sign up</Link><Link href="/login" className="btn btn-ghost btn-lg">Log in</Link></div>
           </div>
           <div className="reveal" style={{ animationDelay: ".15s" }}><ProductMock /></div>
         </div>
@@ -43,7 +43,7 @@ export default async function DetailPage({ params }: P) {
       </div></section>
 
       <section className="py-24"><div className="container-x">
-        <h2 className="h-section max-w-2xl">Everything your team needs, connected</h2>
+        <h2 className="h-section max-w-2xl">What this delivers for your business</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
           {p.features.map((f) => <div key={f.title} className="card p-7"><span className="grid place-items-center w-9 h-9 rounded-full bg-brand-soft text-brand"><Check size={18} /></span><h3 className="text-[22px] mt-5">{f.title}</h3><p className="text-soft mt-2">{f.body}</p></div>)}
         </div>
