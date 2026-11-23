@@ -5,11 +5,16 @@ export async function geminiJson<T>(prompt: string, schema: z.ZodType<T>, respon
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new GeminiError("not_configured", "GEMINI_API_KEY is not set on the server.");
   // Primary model first, then fallbacks when a model is overloaded (503/429).
-  const models = [...new Set([process.env.GEMINI_MODEL || "gemini-flash-latest", "gemini-3.5-flash", "gemini-3.1-flash-lite"])];
+  const models = [...new Set([process.env.GEMINI_MODEL || "gemini-flash-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash"])];
   let lastStatus = 0;
   let sawInvalid = false;
+  // 503s return in a couple of seconds, so cycle through the models for up to ~50s total.
+  const deadline = Date.now() + 50_000;
+  const order = Array.from({ length: 6 }, () => models).flat();
 
-  for (const model of models) {
+  for (const [i, model] of order.entries()) {
+    if (Date.now() > deadline) break;
+    if (i >= models.length) await new Promise((r) => setTimeout(r, 1200));
     let res: Response;
     try {
       res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
@@ -19,7 +24,7 @@ export async function geminiJson<T>(prompt: string, schema: z.ZodType<T>, respon
           contents: [{ role: "user", parts: [{ text: prompt }] }],
           generationConfig: { responseMimeType: "application/json", responseSchema, temperature: 0.4 },
         }),
-        signal: AbortSignal.timeout(40_000),
+        signal: AbortSignal.timeout(25_000),
       });
     } catch { lastStatus = 408; continue; }
     if (!res.ok) {

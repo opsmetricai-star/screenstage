@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   if (!admin) return fail(503, "Submissions are unavailable until Supabase is configured.");
   const { token, name, email, answers } = parsed.data;
 
-  const iv = await admin.from("interviews").select("id, user_id, role_id, script").eq("share_token", token).single();
+  const iv = await admin.from("interviews").select("id, user_id, role_id, title, script").eq("share_token", token).single();
   if (iv.error || !iv.data) return fail(404, "This interview link is not valid.");
   const script = scriptSchema.parse(iv.data.script);
   if (answers.length !== script.questions.length) return fail(400, "Please answer every question.");
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const { evaluation, overall } = await evaluateAnswers(script, qa);
     const cand = await admin.from("candidates").insert({ user_id: iv.data.user_id, role_id: iv.data.role_id, name, email, stage: "screened", score: overall }).select("id").single();
     await admin.from("responses").insert({ user_id: iv.data.user_id, interview_id: iv.data.id, candidate_id: cand.data?.id, answers: qa, evaluation, overall_score: overall });
-    await admin.from("notifications").insert({ user_id: iv.data.user_id, body: `${name} completed "${script.questions.length}-question" screening (${overall}/100).` });
+    await admin.from("notifications").insert({ user_id: iv.data.user_id, body: `${name} completed "${iv.data.title}" (${overall}/100, ${evaluation.recommendation}).` });
     return NextResponse.json({ ok: true });
   } catch (e) {
     await refundCredit(iv.data.user_id, "candidate_evaluation");

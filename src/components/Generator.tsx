@@ -32,7 +32,7 @@ export function Generator({ kind }: { kind: "interview" | "assessment" }) {
         ? <textarea name="description" required minLength={40} rows={6} placeholder="Paste the job description (at least 40 characters)…" className="input" aria-label="Job description" />
         : <><input name="skills" required placeholder="Skills to measure, e.g. empathy, prioritization, attention to detail" className="input" aria-label="Skills" /><label className="text-[14px] text-soft">Questions <select name="count" defaultValue="8" className="input !w-24 ml-2 inline-block">{[5, 8, 10, 12].map((n) => <option key={n}>{n}</option>)}</select></label></>}
       {err && <p role="alert" className="text-brand text-[15px]">{err}</p>}
-      <button disabled={busy} className="btn btn-primary justify-self-start disabled:opacity-60">{busy ? "Generating… this can take ~20s" : "Generate"}</button>
+      <button disabled={busy} className="btn btn-primary justify-self-start disabled:opacity-60">{busy ? "Generating… can take up to a minute" : "Generate"}</button>
     </form>
   );
 }
