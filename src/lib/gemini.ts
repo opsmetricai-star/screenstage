@@ -4,32 +4,41 @@ import { z } from "zod";
 export async function geminiJson<T>(prompt: string, schema: z.ZodType<T>, responseSchema: object): Promise<T> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new GeminiError("not_configured", "GEMINI_API_KEY is not set on the server.");
-  const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+  // Primary model first, then fallbacks when a model is overloaded (503/429).
+  const models = [...new Set([process.env.GEMINI_MODEL || "gemini-flash-latest", "gemini-3.5-flash", "gemini-3.1-flash-lite"])];
+  let lastStatus = 0;
+  let sawInvalid = false;
 
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json", responseSchema, temperature: 0.4 },
-      }),
-      signal: AbortSignal.timeout(60_000),
-    });
+  for (const model of models) {
+    let res: Response;
+    try {
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: "application/json", responseSchema, temperature: 0.4 },
+        }),
+        signal: AbortSignal.timeout(40_000),
+      });
+    } catch { lastStatus = 408; continue; }
     if (!res.ok) {
-      if (res.status === 429 || res.status >= 500) { await new Promise((r) => setTimeout(r, 1500 * (attempt + 1))); continue; }
+      lastStatus = res.status;
+      if (res.status === 429 || res.status >= 500 || res.status === 404) continue;
       const detail = await res.text().catch(() => "");
       throw new GeminiError("upstream", `Gemini returned ${res.status}. ${detail.slice(0, 200)}`);
     }
     const json = await res.json();
-    const text: string | undefined = json?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) continue;
+    const parts: { text?: string; thought?: boolean }[] = json?.candidates?.[0]?.content?.parts ?? [];
+    const text = parts.filter((p) => !p.thought && p.text).map((p) => p.text).join("");
     try {
       const parsed = schema.safeParse(JSON.parse(text));
       if (parsed.success) return parsed.data;
-    } catch { /* retry */ }
+    } catch { /* fall through to next model */ }
+    sawInvalid = true;
   }
-  throw new GeminiError("invalid_output", "The AI did not return a valid structured response. Please try again.");
+  if (sawInvalid) throw new GeminiError("invalid_output", "The AI did not return a valid structured response. Please try again.");
+  throw new GeminiError("upstream", `The AI service is busy right now (status ${lastStatus}). Please try again in a minute.`);
 }
 
 export class GeminiError extends Error {
