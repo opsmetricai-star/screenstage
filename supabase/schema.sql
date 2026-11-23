@@ -155,3 +155,11 @@ begin
   return coalesce(ok, false);
 end $$;
 revoke all on function public.spend_credit(uuid, text, int) from public, anon, authenticated;
+
+-- Grants (required on newer Supabase projects, where tables created via SQL are not auto-granted)
+grant usage on schema public to anon, authenticated, service_role;
+grant all on all tables in schema public to service_role;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+revoke all on public.usage_events, public.subscriptions, public.demo_requests from authenticated;
+grant select on public.usage_events, public.subscriptions to authenticated;
+grant execute on function public.spend_credit(uuid, text, int) to service_role;
