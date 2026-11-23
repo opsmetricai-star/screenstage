@@ -26,11 +26,11 @@ export default async function Billing({ searchParams }: { searchParams: Promise<
         </div>
       )}
       <h2 className="text-[20px] mt-10 mb-3">Choose a plan</h2>
-      <div className="grid md:grid-cols-3 gap-4">{plans.map((pl) => (
+      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">{plans.map((pl) => (
         <div key={pl.id} className={`card p-6 flex flex-col ${p?.plan === pl.id ? "ring-2 ring-brand" : ""}`}>
-          <div className="text-[22px]">{pl.name}</div><div className="text-[34px] font-light">${pl.price}<span className="text-[15px] text-soft"> /mo</span></div>
-          <div className="text-soft text-[14px] mt-1 flex-1">{pl.credits.toLocaleString()} credits / month</div>
-          {p?.plan === pl.id ? <span className="btn btn-ghost mt-4 cursor-default">Current plan</span> : <a href={pl.url} target="_blank" rel="noopener noreferrer" className="btn btn-primary mt-4">Upgrade with Selar</a>}
+          <div className="text-[22px]">{pl.name}</div><div className="text-[34px] font-light">${pl.price}<span className="text-[15px] text-soft">{pl.price === 0 ? "" : " /mo"}</span></div>
+          <div className="text-soft text-[14px] mt-1 flex-1">{pl.credits.toLocaleString()} credits{pl.price === 0 ? " to start" : " / month"}</div>
+          {p?.plan === pl.id ? <span className="btn btn-ghost mt-4 cursor-default">Current plan</span> : !pl.url ? <span className="text-soft text-[14px] mt-4">Included with every account</span> : <a href={pl.url} target="_blank" rel="noopener noreferrer" className="btn btn-primary mt-4">Upgrade with Selar</a>}
         </div>))}</div>
       <p className="text-soft text-[14px] mt-4">Use the same email ({user?.email}) at checkout. Your plan activates after Selar confirms the payment, not on redirect; this usually takes a few minutes.</p>
       <h2 className="text-[20px] mt-10 mb-3">Subscription history</h2>

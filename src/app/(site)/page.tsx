@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BrainCircuit, Database, KeyRound, LineChart, ShieldCheck, Workflow, Gauge, Scale } from "lucide-react";
-import { CtaBand, FaqList, ProductMock } from "@/components/Sections";
+import { CtaBand, FaqList } from "@/components/Sections";
 import { homeFaqs } from "@/lib/content";
 
 const outcomes = [
@@ -34,14 +34,13 @@ const governance = [
 export default function Home() {
   return (
     <>
-      <section className="relative overflow-hidden">
-        <div className="container-x grid lg:grid-cols-[1fr_1.05fr] gap-12 items-center py-16 lg:py-24 min-h-[640px]">
-          <div className="reveal">
+      <section className="relative overflow-hidden bg-gradient-to-b from-white to-tint/60">
+        <div className="container-x flex flex-col items-center text-center py-20 lg:py-32 min-h-[560px] justify-center">
+          <div className="reveal max-w-4xl">
             <h1 className="h-display">The AI engine that decides who to hire, and proves why.</h1>
-            <p className="mt-5 text-[22px] leading-snug text-soft max-w-[580px]">ScreenStage analyzes every applicant, predicts who will perform and ranks candidates on cited evidence. Your team cuts screening cost and time to hire without giving up control of the decision.</p>
-            <div className="mt-9 flex gap-3 flex-wrap"><Link href="/signup" className="btn btn-primary btn-lg">Sign up</Link><Link href="/login" className="btn btn-ghost btn-lg">Log in</Link></div>
+            <p className="mt-6 text-[22px] leading-snug text-soft max-w-[680px] mx-auto">ScreenStage analyzes every applicant, predicts who will perform and ranks candidates on cited evidence. Your team cuts screening cost and time to hire without giving up control of the decision.</p>
+            <div className="mt-10 flex gap-3 flex-wrap justify-center"><Link href="/signup" className="btn btn-primary btn-lg">Sign up</Link><Link href="/login" className="btn btn-ghost btn-lg">Log in</Link></div>
           </div>
-          <div className="reveal" style={{ animationDelay: ".15s" }}><ProductMock /></div>
         </div>
       </section>
 

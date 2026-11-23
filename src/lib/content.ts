@@ -178,7 +178,9 @@ export const homeFaqs: Faq[] = [
   { q: "How does pricing work?", a: "Plans include a monthly credit allowance. Each AI action uses one credit. New accounts start with free credits." },
 ];
 
-export const plans = [
+export type Plan = { id: string; name: string; price: number; blurb: string; url?: string; credits: number; popular?: boolean; features: string[] };
+export const plans: Plan[] = [
+  { id: "free", name: "Free", price: 0, blurb: "For evaluating the platform on a real role.", credits: 5, features: ["5 AI credits to start", "AI interview generation and scoring", "AI-drafted assessments with instant scoring", "Candidate pipeline and analytics"] },
   { id: "starter", name: "Starter", price: 47, blurb: "For teams automating their first hiring workflows.", url: "https://selar.com/47plan?currency=USD", credits: 50, features: ["50 AI credits each month", "AI interview generation and scoring", "AI-drafted assessments with instant scoring", "Candidate pipeline and analytics"] },
   { id: "growth", name: "Growth", price: 57, blurb: "For teams that hire continuously.", url: "https://selar.com/57plan?currency=USD", credits: 200, popular: true, features: ["200 AI credits each month", "Everything in Starter", "Four times the interview capacity", "Priority access to new releases"] },
   { id: "scale", name: "Scale", price: 97, blurb: "For high-volume hiring across multiple requisitions.", url: "https://selar.com/97plan?currency=USD", credits: 1000, features: ["1,000 AI credits each month", "Everything in Growth", "Capacity for sustained high-volume screening", "Lowest cost per AI action"] },
