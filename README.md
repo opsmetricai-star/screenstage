@@ -1,6 +1,6 @@
 # ScreenStage
 
-Agentic hiring platform: AI interviews, skills assessments and video-interview workflow. Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · Supabase · Gemini.
+AI-native hiring platform: AI interviews, AI-drafted assessments and evidence-based candidate scoring. Next.js 16 (App Router), React 19, TypeScript, Tailwind 4, Supabase, Gemini.
 
 ## What is in the repo
 
